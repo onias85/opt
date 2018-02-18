@@ -10,7 +10,7 @@ public class ExemploLeituraProperties {
 	public static void main(String[] args) {
 		Properties prop = new Properties();
 		try {
-		    //load a properties file from class path, inside static method
+//          load a properties file from class path, inside static method
 //		    InputStream as = ExemploLeituraProperties.class.getClassLoader().getResourceAsStream("config.properties");
 		    InputStream is = new java.io.FileInputStream("config.properties");
 			prop.load(is);
@@ -19,7 +19,7 @@ public class ExemploLeituraProperties {
 		    System.out.println(prop.getProperty("database"));
 		    System.out.println(prop.getProperty("dbuser"));
 		    System.out.println(prop.getProperty("dbpassword"));
-
+		    
 		} 
 		catch (IOException ex) {
 		    ex.printStackTrace();
