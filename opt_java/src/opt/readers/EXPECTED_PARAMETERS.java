@@ -1,7 +1,12 @@
 package opt.readers;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import opt.exceptions.IncorrectFileTypeException;
+import opt.exceptions.InexistanttFileException;
+import opt.utils.Validations;
 
 public 
 enum EXPECTED_PARAMETERS{
@@ -97,7 +102,17 @@ enum EXPECTED_PARAMETERS{
 				continue;
 			}
 			expected.created = true;
+			Validations.notEmptyParameter("fileName", fileName);
+			
+			boolean doesNotRequireExistingFile = false == expected.requiresExistingFile();
+		
+			if(doesNotRequireExistingFile) {
+				expected.read(fileName);
+				continue;
+			}
+			validateExistentFile(fileName);
 			expected.read(fileName);
+			
 			// o metodo morre aqui
 			return true;
 		}
@@ -105,6 +120,24 @@ enum EXPECTED_PARAMETERS{
 		return false;
 	}
 	
+	private static void validateExistentFile(String fileName) {
+		
+		File f = new File(fileName);
+		
+		boolean doesNotExist = false == f.exists();
+		if(doesNotExist) {
+			throw new InexistanttFileException(fileName);
+		}
+		
+		boolean directory = f.isDirectory();
+		
+		if(directory) {
+			throw new IncorrectFileTypeException(fileName);
+		}
+		
+	}
+
+
 	abstract void read(String fileName);
 	
 	public String getStatus() {
