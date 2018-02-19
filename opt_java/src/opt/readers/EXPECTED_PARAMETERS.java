@@ -63,6 +63,11 @@ enum EXPECTED_PARAMETERS{
 			
 			
 		}
+		
+		@Override
+		public boolean requiresExistingFile() {
+			return false;
+		}
 	}
 
 	;
@@ -107,5 +112,9 @@ enum EXPECTED_PARAMETERS{
 		props.put("parameter", this.name());
 		props.put("created", this.created);
 		return props.toString();
+	}
+	
+	public boolean requiresExistingFile() {
+		return true;
 	}
 }
