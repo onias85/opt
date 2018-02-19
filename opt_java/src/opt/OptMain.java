@@ -1,8 +1,8 @@
-package opt_java;
+package opt;
 
 import java.util.Arrays;
 
-import opt_java.readers.EXPECTED_PARAMETERS;
+import opt.readers.EXPECTED_PARAMETERS;
 
 public class OptMain {
 

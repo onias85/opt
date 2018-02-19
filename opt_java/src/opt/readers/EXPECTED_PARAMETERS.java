@@ -1,4 +1,4 @@
-package opt_java.readers;
+package opt.readers;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

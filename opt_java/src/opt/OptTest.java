@@ -1,4 +1,4 @@
-package opt_java;
+package opt;
 
 public class OptTest {
 
