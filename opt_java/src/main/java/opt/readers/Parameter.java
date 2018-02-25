@@ -5,7 +5,8 @@ import java.util.Arrays;
 
 import opt.exceptions.EmptyParametersException;
 import opt.exceptions.IncorrectFileTypeException;
-import opt.exceptions.InexistanttFileException;
+import opt.exceptions.InexistantFileException;
+import opt.exceptions.InvalidParametersCountException;
 import opt.exceptions.InvalidSequenceParametersException;
 
 public 
@@ -64,7 +65,7 @@ enum Parameter{
 			
 			if(thisFileDoesNotExist) {
 				String myName = this.name();
-				throw new InexistanttFileException(fileName, myName);
+				throw new InexistantFileException(fileName, myName);
 			}
 			
 			boolean directory = file.isDirectory();
@@ -98,7 +99,7 @@ enum Parameter{
 	H {
 		@Override
 		void read(String fileName) {
-			
+			System.out.println("Showing help content");
 		}
 	},
 
@@ -106,7 +107,7 @@ enum Parameter{
 
 		@Override
 		void read(String fileName) {
-			
+			System.out.println("Showing help content");
 		}
 		
 	}
@@ -125,7 +126,7 @@ enum Parameter{
 		
 		boolean doesNotExist = false == f.exists();
 		if(doesNotExist) {
-			throw new InexistanttFileException(fileName, type);
+			throw new InexistantFileException(fileName, type);
 		}
 		
 		boolean directory = f.isDirectory();
@@ -176,7 +177,11 @@ enum Parameter{
 		// come in pair, being the first one the type of parameter and the second one the file of parameter
 		int validParametersCount = (values.length - 2) * 2;
 		
-		for(int k = 0, m = 0; k < validParametersCount; k++, m += 2) {
+		if(argumentsCount !=  validParametersCount) {
+			throw new InvalidParametersCountException(validParametersCount, argumentsCount);
+		}
+		
+		for(int k = 0, m = 0; k < argumentsCount; k++, m += 2) {
 			
 			Parameter parameter = values[k];
 			
