@@ -1,7 +1,13 @@
 package opt.readers;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import opt.exceptions.EmptyParametersException;
 import opt.exceptions.IncorrectFileTypeException;
@@ -10,46 +16,59 @@ import opt.exceptions.InvalidParametersCountException;
 import opt.exceptions.InvalidSequenceParametersException;
 
 public 
-enum Parameter{
+enum Argument{
 		
 	CONF {
 		@Override
-		void read(String fileName) {
-			System.out.println("reading a conf file called  " + fileName);
-			
+		public void read(String fileName) {
+			try {
+				FileInputStream fis = new FileInputStream(fileName);
+				Properties props = new Properties();
+				props.load(fis);
+
+				Set<Object> keySet = props.keySet();
+				
+				for (Object key : keySet) {
+					Object value = props.get(key);
+					super.put(key.toString(), value);
+				}
+				
+			} catch (IOException e) {
+				throw new RuntimeException("An unexpected error has occurred when reading the file " + fileName, e);
+			}
 		}
 	},
 	LJ {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			System.out.println("reading a LJ file called  " + fileName);
 			
 		}
 	},
 	PARAM {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			System.out.println("reading a param file called  " + fileName);
 			
 		}
 	},
 	DATA {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			System.out.println("reading a data file called  " + fileName);
 			
 		}
 	},
 	PROP {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			System.out.println("reading a prop file called  " + fileName);
 			
 		}
 	},
 	DERIV {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 		
 			String[] array = fileName.split(",");
 			boolean isArray = array.length > 1;
@@ -79,26 +98,26 @@ enum Parameter{
 		}
 
 		@Override
-		public boolean readsJustASingleFile() {
+		public boolean validateFile() {
 			return false;
 		}
 	},
 	OUT {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			
 			System.out.println("writing on a out file called  " + fileName);
 			
 		}
 		
 		@Override
-		public boolean readsJustASingleFile() {
+		public boolean validateFile() {
 			return false;
 		}
 	}, 
 	H {
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			System.out.println("Showing help content");
 		}
 	},
@@ -106,13 +125,28 @@ enum Parameter{
 	HELP{
 
 		@Override
-		void read(String fileName) {
+		public void read(String fileName) {
 			System.out.println("Showing help content");
 		}
 		
 	}
 	;
+	private final Map<String, Object> valuesFromFile = new LinkedHashMap<>();
 	
+	protected void put(String key, Object value) {
+		this.valuesFromFile.put(key, value);
+	}
+	
+	protected void setValuesFromFile(Map<String, Object> valuesFromFile) {
+		
+		this.valuesFromFile.clear();
+		this.valuesFromFile.putAll(valuesFromFile);
+	}
+	
+	public Map<String, Object> getValuesFromFile() {
+		return valuesFromFile;
+	}
+
 	public boolean matches(String paramType) {
 	
 		String string = "-" + this.toString();
@@ -120,7 +154,7 @@ enum Parameter{
 		return matches;
 	}
 	
-	private static void validateExistentFile(String fileName, String type) {
+	private static void validateExistantFile(String fileName, String type) {
 		
 		File f = new File(fileName);
 		
@@ -136,9 +170,9 @@ enum Parameter{
 		}
 	}
 
-	abstract void read(String fileName);
+	public abstract void read(String fileName);
 	
-	public boolean readsJustASingleFile() {
+	public boolean validateFile() {
 		return true;
 	}
 	
@@ -148,9 +182,9 @@ enum Parameter{
 			throw new EmptyParametersException();
 		}
 		
-		int argumentsCount = args.length;
+		int cameUserArgumentsLength = args.length;
 		
-		if(argumentsCount == 0) {
+		if(cameUserArgumentsLength == 0) {
 			throw new EmptyParametersException();
 		}
 
@@ -171,43 +205,48 @@ enum Parameter{
 		}
 		
 		
-		Parameter[] values = values();
+		Argument[] arguments = values();
 
 		// we use "-2" because we are ignoring "-H" and "-Help", so we multiply by to "*2" because the parameters 
 		// come in pair, being the first one the type of parameter and the second one the file of parameter
-		int validParametersCount = (values.length - 2) * 2;
+		int expecetedUserArgumentsLength = (arguments.length - 2) * 2;
 		
-		if(argumentsCount !=  validParametersCount) {
-			throw new InvalidParametersCountException(validParametersCount, argumentsCount);
+		
+		
+		if(cameUserArgumentsLength !=  expecetedUserArgumentsLength) {
+			throw new InvalidParametersCountException(expecetedUserArgumentsLength, cameUserArgumentsLength);
 		}
 		
-		for(int k = 0, m = 0; k < argumentsCount; k++, m += 2) {
+		for(int counterAboutEnum = 0, counterAboutArgsItems = 0; counterAboutEnum < cameUserArgumentsLength; counterAboutEnum++, counterAboutArgsItems += 2) {
 			
-			Parameter parameter = values[k];
+			Argument argument = arguments[counterAboutEnum];
 			
-			String actualType = args[m];
-			String expectedType = parameter.name();
-			boolean doesNotMatch = false == parameter.matches(actualType);
+			String actualType = args[counterAboutArgsItems];
+			String expectedType = argument.name();
+			boolean doesNotMatch = false == argument.matches(actualType);
 			
 			if(doesNotMatch) {
 				throw new InvalidSequenceParametersException(expectedType, actualType);
 			}
-
-			String filePathToRead = args[m + 1];
+			System.out.println(counterAboutEnum);
+			System.out.println(counterAboutArgsItems + 1);
+			System.out.println("--------------------------------");
+			String filePathToRead = args[counterAboutArgsItems + 1];
+			//			String msg = String.format("Lendo um '%s' no arquivo '%s'", argument.name(), filePathToRead);
+//			System.out.println(msg);
+			boolean validateFile = argument.validateFile();
 			
-			boolean doesNotReadOneFile = false == parameter.readsJustASingleFile();
-			
-			if(doesNotReadOneFile) {
-				parameter.read(filePathToRead);
+			if(validateFile) {
+				validateExistantFile(filePathToRead, expectedType);
+				argument.read(filePathToRead);
 				continue;
 			}
 			
-			validateExistentFile(filePathToRead, expectedType);
-			parameter.read(filePathToRead);
+			argument.read(filePathToRead);
 
 		}
 		
 		
 	}
-	
+
 }

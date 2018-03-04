@@ -1,13 +1,13 @@
 package opt;
 
-import opt.readers.Parameter;
+import opt.readers.Argument;
 
 public class OptMain {
 	
 
 	public static void main(String... args) {
 		
-		Parameter.readAllFilesInParameters(args);
+		Argument.readAllFilesInParameters(args);
 	}
 
 
