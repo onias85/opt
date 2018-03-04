@@ -127,7 +127,7 @@ enum Argument{
 
 		@Override
 		public void read(String fileName) {
-			System.out.println("Showing help content");
+			System.out.println("Showing help content"); 
 		}
 		
 	}
