@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -144,7 +145,8 @@ enum Argument{
 	}
 	
 	public Map<String, Object> getValuesFromFile() {
-		return valuesFromFile;
+		Map<String, Object> unmodifiableMap = Collections.unmodifiableMap(valuesFromFile);
+		return unmodifiableMap;
 	}
 
 	public boolean matches(String paramType) {
