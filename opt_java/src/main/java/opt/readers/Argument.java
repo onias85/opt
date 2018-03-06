@@ -107,7 +107,7 @@ enum Argument{
 		@Override
 		public void read(String fileName) {
 			
-			System.out.println("writing on a out file called  " + fileName);
+			System.out.println("writing to a out file called  " + fileName);
 			
 		}
 		
