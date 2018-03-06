@@ -48,15 +48,15 @@ public class OptTest {
 	
 	@Test
 	public void readingCorrectly(){
-//		Argument.readAllFilesInParameters(
-//				"-conf", "conf.txt",
-//				"-lj", "lj.txt",
-//				"-param", "param.txt",
-//				"-data", "data.txt",
-//				"-prop", "prop.txt",
-//				"-deriv", "deriv.txt",
-//				"-out", "out.txt"
-//				);
+		Argument.readAllFilesInParameters(
+				"-conf", "conf.txt",
+				"-lj", "lj.txt",
+				"-param", "param.txt",
+				"-data", "data.txt",
+				"-prop", "prop.txt",
+				"-deriv", "deriv.txt",
+				"-out", "out.txt"
+				);
 		
 		
 		Argument.CONF.read("conf.txt");

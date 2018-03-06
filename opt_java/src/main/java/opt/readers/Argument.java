@@ -95,7 +95,7 @@ enum Argument{
 				return;
 			}
 			
-			System.out.println("Reading a single file Called " + fileName);
+			System.out.println("Reading a single deriv file called " + fileName);
 		}
 
 		@Override
@@ -220,7 +220,9 @@ enum Argument{
 			throw new InvalidParametersCountException(expecetedUserArgumentsLength, cameUserArgumentsLength);
 		}
 		
-		for(int counterAboutEnum = 0, counterAboutArgsItems = 0; counterAboutEnum < cameUserArgumentsLength; counterAboutEnum++, counterAboutArgsItems += 2) {
+		//for(int counterAboutEnum = 0, counterAboutArgsItems = 0; counterAboutEnum < cameUserArgumentsLength; counterAboutEnum++, counterAboutArgsItems += 2) {
+		for(int counterAboutEnum = 0; counterAboutEnum < arguments.length - 2; counterAboutEnum++) {
+			int counterAboutArgsItems = counterAboutEnum * 2;
 			
 			Argument argument = arguments[counterAboutEnum];
 			
@@ -231,8 +233,8 @@ enum Argument{
 			if(doesNotMatch) {
 				throw new InvalidSequenceParametersException(expectedType, actualType);
 			}
-			System.out.println(counterAboutEnum);
-			System.out.println(counterAboutArgsItems + 1);
+//			System.out.println(counterAboutEnum);
+//			System.out.println(counterAboutArgsItems + 1);
 			System.out.println("--------------------------------");
 			String filePathToRead = args[counterAboutArgsItems + 1];
 			//			String msg = String.format("Lendo um '%s' no arquivo '%s'", argument.name(), filePathToRead);
