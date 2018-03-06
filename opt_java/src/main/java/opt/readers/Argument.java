@@ -209,8 +209,9 @@ enum Argument{
 		
 		Argument[] arguments = values();
 
-		// we use "-2" because we are ignoring "-H" and "-Help", so we multiply by to "*2" because the parameters 
-		// come in pair, being the first one the type of parameter and the second one the file of parameter
+		// we use "-2" because we ignore "-H" and "-Help",
+		// we multiply by to "*2" because the parameters come in pairs
+		// where the first one is the type of parameter and the second one the file of parameter
 		int expecetedUserArgumentsLength = (arguments.length - 2) * 2;
 		
 		
