@@ -4,7 +4,7 @@ package opt.exceptions;
 public class EmptyParametersException extends RuntimeException {
 
 	public EmptyParametersException() {
-		super("Are required at least two parameters, being the first one the type of parameter and the second one the file of the parameter");
+		super("At least two parameters are required: the type of argument and the file relative to the argument");
 	}
 
 
