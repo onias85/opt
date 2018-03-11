@@ -49,8 +49,10 @@ enum Argument{
 	LJ {
 		@Override
 		public void read(String fileName) {
+		
 			try(InputStream is =  new FileInputStream(fileName)) {
-				Wini wini  = new Wini();
+				
+				Wini wini  = new Wini(is);
 
 				Set<String> keySet = wini.keySet();
 				
