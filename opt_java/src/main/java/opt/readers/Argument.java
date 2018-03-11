@@ -3,6 +3,7 @@ package opt.readers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -10,9 +11,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.ini4j.InvalidFileFormatException;
+import org.ini4j.Profile.Section;
+import org.ini4j.Wini;
+
+import opt.AtomType;
 import opt.exceptions.EmptyParametersException;
 import opt.exceptions.IncorrectFileTypeException;
 import opt.exceptions.InexistantFileException;
+import opt.exceptions.InvalidFileIniFormatException;
 import opt.exceptions.InvalidParametersCountException;
 import opt.exceptions.InvalidSequenceParametersException;
 
@@ -42,7 +49,24 @@ enum Argument{
 	LJ {
 		@Override
 		public void read(String fileName) {
-			System.out.println("reading a LJ file called  " + fileName);
+			try(InputStream is =  new FileInputStream(fileName)) {
+				Wini wini  = new Wini();
+
+				Set<String> keySet = wini.keySet();
+				
+				for (Object key : keySet) {
+					Section section = wini.get(key);
+					Map<String, String> map = Collections.unmodifiableMap(section);
+					String keyValue = key.toString();
+					AtomType atomType = new AtomType(keyValue, map);
+					super.put(keyValue, atomType);
+				}
+				
+			} catch (InvalidFileFormatException e) {
+				throw new InvalidFileIniFormatException(fileName, e);
+			}  catch (IOException e) {
+				throw new RuntimeException("Unexpected error", e);
+			}
 			
 		}
 	},

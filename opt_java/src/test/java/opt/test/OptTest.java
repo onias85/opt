@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import opt.exceptions.EmptyParametersException;
+import opt.exceptions.InvalidFileIniFormatException;
 import opt.exceptions.InvalidParametersCountException;
 import opt.readers.Argument;
 
@@ -65,6 +66,11 @@ public class OptTest {
 		int configurationsSize = valuesFromFile.size();
 		Assert.assertTrue(configurationsSize == 6);
 	}
-	
+
+	@Test(expected = InvalidFileIniFormatException.class)
+	public void incorrectIniFormatException() {
+		
+		Argument.LJ.read("wrongFormatMatrix.ini");
+	}
 	
 }
