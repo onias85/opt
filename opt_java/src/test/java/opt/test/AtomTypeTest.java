@@ -36,7 +36,7 @@ public class AtomTypeTest {
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void c121MissingTest() {
-		this.emptyAtomType.getC121();
+		this.emptyAtomType.getC121(); 
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
