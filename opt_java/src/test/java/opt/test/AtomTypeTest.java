@@ -60,4 +60,9 @@ public class AtomTypeTest {
 		this.emptyAtomType.getC12NB();
 	}
 
+	@Test(expected = PropertyIsMissingException.class)
+	public void matrixMissingTest() {
+		this.emptyAtomType.getMatrix();
+	}
+
 }
