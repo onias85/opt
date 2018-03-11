@@ -35,7 +35,23 @@ public class AtomType {
 			throw new PropertyIsMissingException(propertyName, this.properties);
 		}
 		
-		String str = this.properties.get(propertyName).toString();
+		Object object = this.properties.get(propertyName);
+
+		if(object == null) {
+			throw new PropertyIsMissingException(propertyName, this.properties);
+		}
+		
+		String string = object.toString();
+		if(string == null) {
+			throw new PropertyIsMissingException(propertyName, this.properties);
+		}
+
+		boolean empty = string.trim().isEmpty();
+		if(empty) {
+			throw new PropertyIsMissingException(propertyName, this.properties);
+		}
+		
+		String str = string;
 		
 		boolean isNotCompatible = false == format.isCompatible(str);
 		
