@@ -1,8 +1,13 @@
 package opt.test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ini4j.InvalidFileFormatException;
+import org.ini4j.Profile.Section;
+import org.ini4j.Wini;
 import org.junit.Test;
 
 import opt.AtomType;
@@ -63,6 +68,13 @@ public class AtomTypeTest {
 	@Test(expected = PropertyIsMissingException.class)
 	public void matrixMissingTest() {
 		this.emptyAtomType.getMatrix();
+	}
+	
+	public static void main(String[] args) throws Exception {
+		Wini wini = new Wini(new File("marina.ini"));
+		Section section = wini.get("71");
+		AtomType at = new AtomType("71", section);
+		System.out.println(at);
 	}
 
 }
