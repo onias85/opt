@@ -66,10 +66,17 @@ public class AtomType {
 	}
 	
 	public List<Long> getMatrix() {
+		
 		String matrix = this.getValidPropertyValue("MATRIX", Format.STRING, String.class);
 		String[] split = matrix.split(" ");
 		List<Long> result = new ArrayList<>();
+		
 		for (String matrixItem : split) {
+			
+			if(matrixItem.isEmpty()) {
+				continue;
+			}
+			
 			boolean isNotNumber = false == Ask.isLong(matrixItem);
 			if(isNotNumber) {
 				throw new InvalidMatrixException(matrix);

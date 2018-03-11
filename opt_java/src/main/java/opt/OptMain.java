@@ -8,6 +8,7 @@ public class OptMain {
 	public static void main(String... args) {
 		
 		Argument.readAllFilesInParameters(args);
+		
 	}
 
 
