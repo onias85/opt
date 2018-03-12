@@ -18,24 +18,60 @@ public class AtomType {
 	
 	
 	public AtomType(String index, Map<String, String> properties) {
+		//properties.put("INDEX", index);		
+		//Long  idx     = this.getValidPropertyValue(properties, "INDEX", Format.LONG, Long.class);
 		
+		String  name  = this.getValidPropertyValue(properties, "NAME", Format.STRING, String.class);
+		boolean CONST = this.getValidPropertyValue(properties, "CONST", Format.BOOLEAN, Boolean.class);
+		Double  c06   = this.getValidPropertyValue(properties, "C06", Format.DOUBLE, Double.class);
+		Double  c12_1 = this.getValidPropertyValue(properties, "C12_1", Format.DOUBLE, Double.class);
+		Double  c12_2 = this.getValidPropertyValue(properties, "C12_2", Format.DOUBLE, Double.class);
+		Double  c12_3 = this.getValidPropertyValue(properties, "C12_3", Format.DOUBLE, Double.class);
+		Double  c06NB = this.getValidPropertyValue(properties, "C06_NB", Format.DOUBLE, Double.class);
+		Double  c12NB = this.getValidPropertyValue(properties, "C12_NB", Format.DOUBLE, Double.class);
+		String sequence = this.getValidPropertyValue(properties, "MATRIX", Format.STRING, String.class);
+		
+		
+		String[] split = sequence.split(" ");
+		List<Long> matrix = new ArrayList<>();
+		for (String matrixItem : split) {
+			if(matrixItem.isEmpty()) {
+				continue;
+			}
+			boolean isNotNumber = false == Ask.isLong(matrixItem);
+			if(isNotNumber) {
+				throw new InvalidMatrixException(sequence);
+			}
+			matrix.add(new Long(matrixItem));
+		}
+				
 		Map<String, Object> map = new HashMap<>();
-		map.putAll(properties);
-		map.put("index", index);
+		//map.put("IDX", idx);
+		map.put("NAME", name);
+		map.put("CONST", CONST);
+		map.put("C06", c06);
+		map.put("C12_1", c12_1);
+		map.put("C12_2", c12_2);
+		map.put("C12_3", c12_3);
+		map.put("C06_NB", c06NB);
+		map.put("C12_NB", c12NB);
+		map.put("MATRIX", matrix);
+		
+	
 
 		this.properties = map;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <P> P getValidPropertyValue(String propertyName, Format format, Class<P> clazz) {
+	public <P> P getValidPropertyValue(Map<String, String> properties, String propertyName, Format format, Class<P> clazz) {
 		
-		boolean thisPropertyIsNotPresent = false == this.properties.containsKey(propertyName);		
+		boolean thisPropertyIsNotPresent = false == properties.containsKey(propertyName);
 		
 		if(thisPropertyIsNotPresent) {
 			throw new PropertyIsMissingException(propertyName, this.properties);
 		}
 		
-		Object object = this.properties.get(propertyName);
+		Object object = properties.get(propertyName);
 
 		if(object == null) {
 			throw new PropertyIsMissingException(propertyName, this.properties);
@@ -66,73 +102,46 @@ public class AtomType {
 	}
 	
 	public List<Long> getMatrix() {
-		
-		String matrix = this.getValidPropertyValue("MATRIX", Format.STRING, String.class);
-		String[] split = matrix.split(" ");
-		List<Long> result = new ArrayList<>();
-		
-		for (String matrixItem : split) {
-			
-			if(matrixItem.isEmpty()) {
-				continue;
-			}
-			
-			boolean isNotNumber = false == Ask.isLong(matrixItem);
-			if(isNotNumber) {
-				throw new InvalidMatrixException(matrix);
-			}
-			
-			result.add(new Long(matrixItem));
-		}
-		return result;
+		return (List<Long>) this.properties.get("MATRIX");
 	}
 	
 
 	public Long getIndex() {
-		Long validPropertyValue = this.getValidPropertyValue("index", Format.LONG, Long.class);
-		return validPropertyValue;
+		return (Long) this.properties.get("IDX");
 	}
 	
 	public boolean isConst() {
-		Boolean validPropertyValue = this.getValidPropertyValue("CONST", Format.BOOLEAN, Boolean.class);
-		return validPropertyValue;
+		return (boolean) this.properties.get("CONST");
 	}
 	
 	
 	public String getName() {
-		String validPropertyValue = this.getValidPropertyValue("NAME", Format.STRING, String.class);
-		return validPropertyValue;
+		return this.properties.get("NAME").toString();
 	}
 	
 	public Double getC06() {
-		Double validPropertyValue = this.getValidPropertyValue("C06", Format.DOUBLE, Double.class);
-		return validPropertyValue;
+		return (Double) this.properties.get("C06");
 	}
 	
 	public Double getC121() {
-		Double validPropertyValue = this.getValidPropertyValue("C12_1", Format.DOUBLE, Double.class);
-		return validPropertyValue;
+		return (Double) this.properties.get("C12_1");
 	}
 	
 	public Double getC122() {
-		Double validPropertyValue = this.getValidPropertyValue("C12_2", Format.DOUBLE, Double.class);
-		return validPropertyValue;
+		return (Double) this.properties.get("C12_2");
 	}
 	
 	public Double getC123() {
-		Double validPropertyValue = this.getValidPropertyValue("C12_3", Format.DOUBLE, Double.class);
-		return validPropertyValue;
+		return (Double) this.properties.get("C12_3");
 	}
 	
 	public Double getC06NB() {
-		Double validPropertyValue = this.getValidPropertyValue("C06_NB", Format.DOUBLE, Double.class);
-		return validPropertyValue;
+		return (Double) this.properties.get("C06_NB");
 	}
 	
 
 	public Double getC12NB() {
-		Double validPropertyValue = this.getValidPropertyValue("C12_NB", Format.DOUBLE, Double.class);
-		return validPropertyValue;
+		return (Double) this.properties.get("C12_NB");
 	}
 	
 
