@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -22,6 +23,7 @@ import opt.exceptions.InexistantFileException;
 import opt.exceptions.InvalidFileIniFormatException;
 import opt.exceptions.InvalidParametersCountException;
 import opt.exceptions.InvalidSequenceParametersException;
+import opt.exceptions.atomtype.InvalidMatrixException;
 
 public 
 enum Argument{
@@ -62,6 +64,22 @@ enum Argument{
 					String keyValue = key.toString();
 					AtomType atomType = new AtomType(keyValue, map);
 					super.put(keyValue, atomType);
+				}
+				
+				int prevSize = -1;
+				Map<String, Object> map = getValuesFromFile();
+				for (Object key : map.keySet()) {
+					AtomType atomType = (AtomType) map.get(key);
+					List<Long> matrix = atomType.getMatrix();
+					int curSize = matrix.size();
+					
+					if (curSize != prevSize) {
+						if (prevSize != -1) {	
+							throw new InvalidMatrixException(atomType.getIndex());
+						}
+					}
+					prevSize = curSize;
+					
 				}
 				
 			} catch (InvalidFileFormatException e) {

@@ -114,7 +114,7 @@ public class AtomType {
 	
 
 	public Long getIndex() {
-		return (Long) this.properties.get("IDX");
+		return (Long) this.properties.get("INDEX");
 	}
 	
 	public boolean isConst() {

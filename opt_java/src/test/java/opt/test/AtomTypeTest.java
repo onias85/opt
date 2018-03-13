@@ -111,6 +111,12 @@ public class AtomTypeTest {
 		Argument.LJ.read("lj_matrix_nonnumeric.txt");
 	}
 	
+	@Test(expected = InvalidMatrixException.class)
+	public void matrixMismatchSizeTest() {
+		Argument.LJ.read("lj_matrix_mismatch_size.txt");
+	}
+	
+	
 //	public static void main(String[] args) throws Exception {
 //		Wini wini = new Wini(new File("marina.ini"));
 //		Section section = wini.get("71");
