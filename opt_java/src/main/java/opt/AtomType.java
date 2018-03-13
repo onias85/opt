@@ -1,6 +1,7 @@
 package opt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,20 +19,41 @@ public class AtomType {
 	
 	
 	public AtomType(String index, Map<String, String> properties) {
-		//properties.put("INDEX", index);		
+		//properties.put("INDEX", index);		vc nao pode fazer isso pq a instancia do properties eh imutavel
 		//Long  idx     = this.getValidPropertyValue(properties, "INDEX", Format.LONG, Long.class);
 		
-		String  name  = this.getValidPropertyValue(properties, "NAME", Format.STRING, String.class);
-		boolean CONST = this.getValidPropertyValue(properties, "CONST", Format.BOOLEAN, Boolean.class);
-		Double  c06   = this.getValidPropertyValue(properties, "C06", Format.DOUBLE, Double.class);
-		Double  c12_1 = this.getValidPropertyValue(properties, "C12_1", Format.DOUBLE, Double.class);
-		Double  c12_2 = this.getValidPropertyValue(properties, "C12_2", Format.DOUBLE, Double.class);
-		Double  c12_3 = this.getValidPropertyValue(properties, "C12_3", Format.DOUBLE, Double.class);
-		Double  c06NB = this.getValidPropertyValue(properties, "C06_NB", Format.DOUBLE, Double.class);
-		Double  c12NB = this.getValidPropertyValue(properties, "C12_NB", Format.DOUBLE, Double.class);
-		String sequence = this.getValidPropertyValue(properties, "MATRIX", Format.STRING, String.class);
+		HashMap<String, Object> props = new HashMap<>(properties); // ja cria um novo map carregado com os valores do map imodificavel
+		props.put("INDEX", index);/// esse map eh alterável diferente do properties
+		
+		Long idx = this.getValidPropertyValue(props, "INDEX", Format.LONG, Long.class);
+		Double  c06   = this.getValidPropertyValue(props, "C06", Format.DOUBLE, Double.class);
+		String  name  = this.getValidPropertyValue(props, "NAME", Format.STRING, String.class);
+		Double  c12_1 = this.getValidPropertyValue(props, "C12_1", Format.DOUBLE, Double.class);
+		Double  c12_2 = this.getValidPropertyValue(props, "C12_2", Format.DOUBLE, Double.class);
+		Double  c12_3 = this.getValidPropertyValue(props, "C12_3", Format.DOUBLE, Double.class);
+		Double  c06NB = this.getValidPropertyValue(props, "C06_NB", Format.DOUBLE, Double.class);
+		Double  c12NB = this.getValidPropertyValue(props, "C12_NB", Format.DOUBLE, Double.class);
+		boolean CONST = this.getValidPropertyValue(props, "CONST", Format.BOOLEAN, Boolean.class);
+		String sequence = this.getValidPropertyValue(props, "MATRIX", Format.STRING, String.class);
 		
 		
+		List<Long> matrix = this.getMatrix(sequence);
+		//substituir todos os valores antigos pelas referencias novas
+		props.put("C06", c06);
+		props.put("INDEX", idx);
+		props.put("NAME", name);
+		props.put("CONST", CONST);
+		props.put("C12_1", c12_1);
+		props.put("C12_2", c12_2);
+		props.put("C12_3", c12_3);
+		props.put("C06_NB", c06NB);
+		props.put("C12_NB", c12NB);
+		props.put("MATRIX", matrix);
+		
+		this.properties = Collections.unmodifiableMap(props);
+	}
+
+	private List<Long> getMatrix(String sequence) {
 		String[] split = sequence.split(" ");
 		List<Long> matrix = new ArrayList<>();
 		for (String matrixItem : split) {
@@ -44,26 +66,11 @@ public class AtomType {
 			}
 			matrix.add(new Long(matrixItem));
 		}
-				
-		Map<String, Object> map = new HashMap<>();
-		//map.put("IDX", idx);
-		map.put("NAME", name);
-		map.put("CONST", CONST);
-		map.put("C06", c06);
-		map.put("C12_1", c12_1);
-		map.put("C12_2", c12_2);
-		map.put("C12_3", c12_3);
-		map.put("C06_NB", c06NB);
-		map.put("C12_NB", c12NB);
-		map.put("MATRIX", matrix);
-		
-	
-
-		this.properties = map;
+		return matrix;
 	}
 
 	@SuppressWarnings("unchecked")
-	public <P> P getValidPropertyValue(Map<String, String> properties, String propertyName, Format format, Class<P> clazz) {
+	public <P> P getValidPropertyValue(Map<String, Object> properties, String propertyName, Format format, Class<P> clazz) {
 		
 		boolean thisPropertyIsNotPresent = false == properties.containsKey(propertyName);
 		
