@@ -12,8 +12,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import opt.AtomType;
-import opt.exceptions.InvalidMatrixException;
-import opt.exceptions.PropertyIsMissingException;
+import opt.exceptions.atomtype.InvalidMatrixException;
+import opt.exceptions.atomtype.PropertyIsMissingException;
 import opt.readers.Argument;
 
 public class AtomTypeTest {

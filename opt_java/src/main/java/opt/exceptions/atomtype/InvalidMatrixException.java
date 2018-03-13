@@ -1,4 +1,4 @@
-package opt.exceptions;
+package opt.exceptions.atomtype;
 
 @SuppressWarnings("serial")
 public class InvalidMatrixException extends RuntimeException{

@@ -1,4 +1,4 @@
-package opt.exceptions;
+package opt.exceptions.atomtype;
 
 import java.util.Map;
 

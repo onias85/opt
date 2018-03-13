@@ -9,8 +9,8 @@ import java.util.Map;
 import com.google.gson.GsonBuilder;
 
 import opt.exceptions.IncompatibleFormatException;
-import opt.exceptions.InvalidMatrixException;
-import opt.exceptions.PropertyIsMissingException;
+import opt.exceptions.atomtype.InvalidMatrixException;
+import opt.exceptions.atomtype.PropertyIsMissingException;
 import opt.utils.Ask;
 
 public class AtomType {
@@ -23,7 +23,7 @@ public class AtomType {
 		//Long  idx     = this.getValidPropertyValue(properties, "INDEX", Format.LONG, Long.class);
 		
 		HashMap<String, Object> props = new HashMap<>(properties); // ja cria um novo map carregado com os valores do map imodificavel
-		props.put("INDEX", index);/// esse map eh alterável diferente do properties
+		props.put("INDEX", index);/// esse map eh alterï¿½vel diferente do properties
 		
 		Long idx = this.getValidPropertyValue(props, "INDEX", Format.LONG, Long.class);
 		Double  c06   = this.getValidPropertyValue(props, "C06", Format.DOUBLE, Double.class);
