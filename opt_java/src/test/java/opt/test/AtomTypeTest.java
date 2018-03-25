@@ -82,7 +82,7 @@ public class AtomTypeTest {
 	@Test(expected = PropertyIsMissingException.class)
 	public void c12NBMissingTest() {
 
-		this.map.remove(MATRIX);
+		this.map.remove(C12_NB);
 		new AtomType("1", map);
 	}
 
