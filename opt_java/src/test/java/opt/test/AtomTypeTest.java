@@ -1,14 +1,9 @@
 package opt.test;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ini4j.InvalidFileFormatException;
-import org.ini4j.Profile.Section;
-import org.ini4j.Wini;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import opt.AtomType;
@@ -18,92 +13,83 @@ import opt.readers.Argument;
 
 public class AtomTypeTest {
 	
+	private static final String MATRIX = "MATRIX";
+	private static final String C12_NB = "C12_NB";
+	private static final String C06_NB = "C06_NB";
+	private static final String C12_3 = "C12_3";
+	private static final String C12_2 = "C12_2";
+	private static final String C12_1 = "C12_1";
+	private static final String C06 = "C06";
+	private static final String CONST = "CONST";
+	private static final String NAME = "NAME";
 	private Map<String,  String> map = new HashMap<>();
 	
 	@Test(expected = PropertyIsMissingException.class)
 	public void idxIsMissingTest() {
-		AtomType emptyAtomType = new AtomType("", map);
+		
+		new AtomType("", map);
 	}
 		
 	@Test(expected = PropertyIsMissingException.class)
 	public void nameIsMissingTest() {
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(NAME);
+		new AtomType("1", map);
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void constIsMissingTest() {
-		map.put("NAME", "OA");
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(CONST);
+		new AtomType("1", map);
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void c06MissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(C06);
+		new AtomType("1", map);
 	}
 	
 	@Test(expected = PropertyIsMissingException.class)
 	public void c121MissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		map.put("C06", "0.00");
-		AtomType emptyAtomType = new AtomType("1", map); 
+
+		this.map.remove(C12_1);
+		new AtomType("1", map);
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void c122MissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		map.put("C06", "0.00");
-		map.put("C12_1", "0.00");
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(C12_2);
+		new AtomType("1", map);
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void c123MissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		map.put("C06", "0.00");
-		map.put("C12_1", "0.00");
-		map.put("C12_2", "0.00");
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(C12_3);
+		new AtomType("1", map);
 	}
 	
 	@Test(expected = PropertyIsMissingException.class)
 	public void c06NBMissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		map.put("C06", "0.00");
-		map.put("C12_1", "0.00");
-		map.put("C12_2", "0.00");
-		map.put("C12_3", "0.00");
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(C06_NB);
+		new AtomType("1", map);
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void c12NBMissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		map.put("C06", "0.00");
-		map.put("C12_1", "0.00");
-		map.put("C12_2", "0.00");
-		map.put("C12_3", "0.00");
-		map.put("C06_NB", "0.00");
-		AtomType emptyAtomType = new AtomType("1", map);
+
+		this.map.remove(MATRIX);
+		new AtomType("1", map);
 	}
 
 	@Test(expected = PropertyIsMissingException.class)
 	public void matrixMissingTest() {
-		map.put("NAME", "OA");
-		map.put("CONST", "True");
-		map.put("C06", "0.00");
-		map.put("C12_1", "0.00");
-		map.put("C12_2", "0.00");
-		map.put("C12_3", "0.00");
-		map.put("C06_NB", "0.00");
-		map.put("C12_NB", "0.00");
-		AtomType emptyAtomType = new AtomType("1", map);
+		this.map.remove(MATRIX);
+		new AtomType("1", map);
 	}
 	
 	@Test(expected = InvalidMatrixException.class)
@@ -117,11 +103,17 @@ public class AtomTypeTest {
 	}
 	
 	
-//	public static void main(String[] args) throws Exception {
-//		Wini wini = new Wini(new File("marina.ini"));
-//		Section section = wini.get("71");
-//		AtomType at = new AtomType("71", section);
-//		System.out.println(at);
-//	}
+	@Before
+	public void setup() {
+		this.map.put(NAME, "OA");
+		this.map.put(CONST, "True");
+		this.map.put(C06, "0.00");
+		this.map.put(C12_1, "0.00");
+		this.map.put(C12_2, "0.00");
+		this.map.put(C12_3, "0.00");
+		this.map.put(C06_NB, "0.00");
+		this.map.put(C12_NB, "0.00");
+		this.map.put(MATRIX, "1 1 1");
+	}
 
 }
