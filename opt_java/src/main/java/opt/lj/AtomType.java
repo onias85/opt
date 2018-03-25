@@ -1,4 +1,4 @@
-package opt;
+package opt.lj;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,8 +108,9 @@ public class AtomType {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Long> getMatrix() {
-		return (List<Long>) this.properties.get("MATRIX");
+		return ((List<Long>) this.properties.get("MATRIX"));
 	}
 	
 

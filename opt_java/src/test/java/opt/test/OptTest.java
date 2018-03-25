@@ -5,6 +5,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.gson.GsonBuilder;
+
 import opt.exceptions.EmptyParametersException;
 import opt.exceptions.InvalidFileIniFormatException;
 import opt.exceptions.InvalidParametersCountException;
@@ -71,6 +73,16 @@ public class OptTest {
 	public void incorrectIniFormatException() {
 		
 		Argument.LJ.read("wrongFormatMatrix.ini");
+	}
+	
+	@Test
+	public void testCorrectReadingToData() {
+		Argument.DATA.read("data.txt");
+		Map<String, Object> valuesFromFile = Argument.DATA.getValuesFromFile();
+		System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(valuesFromFile));
+		
+		int size = valuesFromFile.size();
+		Assert.assertTrue(7 == size);
 	}
 	
 }

@@ -6,9 +6,9 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import opt.AtomType;
 import opt.exceptions.atomtype.InvalidMatrixException;
 import opt.exceptions.atomtype.PropertyIsMissingException;
+import opt.lj.AtomType;
 import opt.readers.Argument;
 
 public class AtomTypeTest {
