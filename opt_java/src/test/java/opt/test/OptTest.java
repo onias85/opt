@@ -1,5 +1,7 @@
 package opt.test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
 
 import org.junit.Assert;
@@ -85,4 +87,12 @@ public class OptTest {
 		Assert.assertTrue(7 == size);
 	}
 	
+	
+	@Test
+	public void testPropReading() {
+		Argument.CONF.read("prop.txt");
+		Map<String, Object> valuesFromFile = Argument.CONF.getValuesFromFile();
+		boolean isCorrect = valuesFromFile.size() == 2;
+		assertTrue(isCorrect);
+	}
 }

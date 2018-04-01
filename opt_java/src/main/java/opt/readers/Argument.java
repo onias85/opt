@@ -3,6 +3,7 @@ package opt.readers;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,21 +39,8 @@ enum Argument{
 	CONF {
 		@Override
 		public void read(String fileName) {
-			try {
-				FileInputStream fis = new FileInputStream(fileName);
-				Properties props = new Properties();
-				props.load(fis);
+			super.putAll(fileName);
 
-				Set<Object> keySet = props.keySet();
-				
-				for (Object key : keySet) {
-					Object value = props.get(key);
-					super.put(key.toString(), value);
-				}
-				
-			} catch (IOException e) {
-				throw new RuntimeException("An unexpected error has occurred when reading the file " + fileName, e);
-			}
 		}
 	},
 	LJ {
@@ -245,7 +233,8 @@ enum Argument{
 	PROP {
 		@Override
 		public void read(String fileName) {
-			System.out.println("reading a prop file called  " + fileName);
+
+			super.putAll(fileName);
 			
 		}
 	},
@@ -434,6 +423,29 @@ enum Argument{
 		}
 		
 		
+	}
+
+	private void putAll(String fileName) {
+		
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(fileName);
+		} catch (FileNotFoundException e) {
+			String type = this.name();
+			throw new InexistantFileException(fileName, type);
+		}
+		Properties props = new Properties();
+		try {
+			props.load(fis);
+		} catch (IOException e) {
+			throw new RuntimeException("Unexpected error", e);
+		}
+		Set<Object> keySet = props.keySet();
+		
+		for (Object key : keySet) {
+			Object value = props.get(key);
+			this.put(key.toString(), value);
+		}
 	}
 
 }
