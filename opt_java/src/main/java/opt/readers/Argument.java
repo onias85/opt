@@ -21,6 +21,7 @@ import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 import org.ini4j.Wini;
 
+import opt.ParametersSet;
 import opt.data.Compound;
 import opt.data.Property;
 import opt.exceptions.EmptyParametersException;
@@ -57,7 +58,9 @@ enum Argument{
 					Section section = wini.get(key);
 					Map<String, String> map = Collections.unmodifiableMap(section);
 					String keyValue = key.toString();
-					AtomType atomType = new AtomType(keyValue, map);
+//					AtomType atomType = new AtomType(keyValue, map);
+					AtomType atomType = new AtomType(map, keyValue);
+					
 					super.put(keyValue, atomType);
 				}
 				

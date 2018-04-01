@@ -22,7 +22,7 @@ public class AtomTypeTest {
 	private static final String C06 = "C06";
 	private static final String CONST = "CONST";
 	private static final String NAME = "NAME";
-	private Map<String,  String> map = new HashMap<>();
+	private Map<String,  Object> map = new HashMap<>();
 	
 	@Test(expected = PropertyIsMissingException.class)
 	public void idxIsMissingTest() {
