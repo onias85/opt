@@ -21,9 +21,10 @@ import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile.Section;
 import org.ini4j.Wini;
 
-import opt.ParametersSet;
 import opt.data.Compound;
 import opt.data.Property;
+import opt.data.deriv.Charge;
+import opt.data.deriv.Deriv;
 import opt.exceptions.EmptyParametersException;
 import opt.exceptions.IncorrectFileTypeException;
 import opt.exceptions.InexistantFileException;
@@ -100,8 +101,6 @@ enum Argument{
 		@Override
 		public void read(String fileName) {
 
-			
-			
 			try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
 
 				int k = 0;
@@ -124,7 +123,6 @@ enum Argument{
 					split =  asList.toArray(new String[asList.size()]);
 					
 					if(isTitleLine) {
-						
 						propertiesList = this.getPropertiesList(split);
 						continue;
 					}
@@ -173,8 +171,6 @@ enum Argument{
 				boolean isError = index == 1;
 				
 			
-				
-				
 				if(isExperimental) {
 					
 					experimentalValue = this.getDouble(value);
@@ -211,7 +207,8 @@ enum Argument{
 			return new Double(value);
 		}
 
-		private List<String> getPropertiesList(String[] split) {
+		public List<String> getPropertiesList(String[] split) {
+			
 			List<String> propertiesList = new ArrayList<>(); 
 
 			int m = 0;
@@ -262,10 +259,86 @@ enum Argument{
 				throw new InexistantFileException(fileName, myName);
 			}
 			
-			boolean directory = file.isDirectory();
+			boolean isFolder = file.isDirectory();
 			
-			if(directory) {
+			if(isFolder) {
 				String.format("Reading a folder called '%s' containing the files '%s'", fileName, Arrays.asList(file.list()));
+				
+				Map<String, Object> compounds = Argument.DATA.getValuesFromFile();
+				
+				Set<String> keySet = compounds.keySet();
+				
+				List<String> existingDerivs = Arrays.asList(file.listFiles()).stream().map(f -> f.getName()).collect(Collectors.toList());
+
+				List<String> errors = new ArrayList<>();
+				
+				for (String compoundName : keySet) {
+					
+					Object obj = compounds.get(compoundName);
+					
+					Compound compound = (Compound)obj;
+					
+					List<Property> properties = compound.properties;
+
+					List<Deriv> derivateds = new ArrayList<>();
+					
+					for (Property property : properties) {
+						
+						StringBuilder derivName = new StringBuilder(compoundName).append("_").append(property.propertyName).append(".txt");
+						
+						boolean derivNotFound = false == existingDerivs.contains(derivName.toString());	
+						
+						if(derivNotFound) {
+							String absolutePath = file.getAbsolutePath();
+							String format = String.format("The derivated file '%s' was not found in the folder '%s'", derivName, absolutePath);
+							errors.add(format);
+							continue;
+						}
+						
+						try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+							
+							String line;
+							
+							while((line = br.readLine()) != null) {
+							
+								boolean parameterCharge = line.startsWith("CHG_");
+								
+								String[] split = line.split(" ");
+
+								String parameterValueAsString = split[split.length - 2];
+								String derivValueAsString = split[split.length - 1];
+								String atomTypeIndexAsString = split[1];
+								String name = split[0];
+								
+								Double derivValue = new Double(derivValueAsString);
+								Double parameterValue = new Double(parameterValueAsString);
+								Map<String, Object> valuesFromFile2 = Argument.LJ.getValuesFromFile();
+								AtomType at1 = (AtomType) valuesFromFile2.get(atomTypeIndexAsString);
+
+								if(parameterCharge) {
+									Deriv e = new Charge(parameterValue, derivValue, property, compound, name, at1);
+									derivateds.add(e);
+									continue;
+								}
+
+								String atomType2IndexAsString = split[2];
+								AtomType at2 = (AtomType) valuesFromFile2.get(atomType2IndexAsString);
+								Deriv e = new opt.data.deriv.LJ(parameterValue, derivValue, property, compound, name, at1, at2);
+								derivateds.add(e);
+							}
+						
+						}catch(IOException e) {
+							continue;
+						}
+						super.put(derivName.toString(), derivateds);
+					}
+					
+					
+				}
+				
+				
+				
+				
 				return;
 			}
 			

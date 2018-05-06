@@ -2,9 +2,8 @@ package opt.data;
 
 public class Property {
 	
-
 	public final Double experimentalValue;
-	
+
 	public final Double simulatedValue;
 
 	public final String propertyName;

@@ -1,5 +1,4 @@
 package opt;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -16,8 +15,8 @@ public class ParameterDescription<Input, Output> {
 	public final Map<String, Object> properties;
 	
 	public final Format format;
-	public final String name;
 	
+	public final String name;
 	
 	
 	public ParameterDescription(String name, Format format, Map<String, Object> properties) {
@@ -68,10 +67,6 @@ public class ParameterDescription<Input, Output> {
 		return json;
 	}
 
-	
-	
-	
-	
 	static class DefaultTransformation<Input, Output> implements ParameterTransformation<Output>{
 
 		public final String name;
@@ -124,8 +119,8 @@ public class ParameterDescription<Input, Output> {
 			Object parse = this.format.parse(str);
 			
 			return (Output)parse;
-			
 		}
+
 		@Override
 		public Output getTransformedValue() {
 			Output validPropertyValue = this.getValidPropertyValue(this.properties);
