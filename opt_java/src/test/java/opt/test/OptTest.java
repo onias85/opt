@@ -59,7 +59,7 @@ public class OptTest {
 				"-param", "param.txt",
 				"-data", "data.txt",
 				"-prop", "prop.txt",
-				"-deriv", "deriv.txt",
+				"-deriv", "deriv",
 				"-out", "out.txt"
 				);
 		
@@ -69,6 +69,26 @@ public class OptTest {
 		
 		int configurationsSize = valuesFromFile.size();
 		Assert.assertTrue(configurationsSize == 6);
+	}
+
+	@Test
+	public void readingDerivCorrectly(){
+		Argument.readAllFilesInParameters(
+				"-conf", "conf.txt",
+				"-lj", "lj.txt",
+				"-param", "param.txt",
+				"-data", "data.txt",
+				"-prop", "prop.txt",
+				"-deriv", "deriv",
+				"-out", "out.txt"
+				);
+		
+		
+		Argument.CONF.read("conf.txt");
+		Map<String, Object> valuesFromFile = Argument.DERIV.getValuesFromFile();
+		
+		int configurationsSize = valuesFromFile.size();
+		Assert.assertTrue(configurationsSize == 14);
 	}
 
 	@Test(expected = InvalidFileIniFormatException.class)

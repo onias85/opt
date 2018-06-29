@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,9 @@ import org.ini4j.Wini;
 
 import opt.data.Compound;
 import opt.data.Property;
+import opt.data.angle.Angle;
+import opt.data.atom.Atom;
+import opt.data.bond.Bond;
 import opt.data.deriv.Charge;
 import opt.data.deriv.Deriv;
 import opt.exceptions.EmptyParametersException;
@@ -34,6 +39,7 @@ import opt.exceptions.InvalidSequenceParametersException;
 import opt.exceptions.atomtype.InvalidMatrixException;
 import opt.lj.AtomType;
 import opt.utils.Ask;
+import opt.utils.IntegerDecorator;
 
 public 
 enum Argument{
@@ -43,6 +49,59 @@ enum Argument{
 		public void read(String fileName) {
 			super.putAll(fileName);
 
+		}
+	},
+	BONDTYPE {
+		@Override
+		public void read(String fileName) {
+
+			try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+				
+				String line;
+				
+				while((line = br.readLine())!= null) {
+					String[] split = line.split(" ");
+					List<String> asList = Arrays.asList(split);
+					asList = asList.stream().filter(s -> false == s.trim().isEmpty()).collect(Collectors.toList());
+					split =  asList.toArray(new String[asList.size()]);
+
+					String idx = split[0];
+					Double r = Double.parseDouble(split[3]);
+					super.put(idx, r);
+				}
+				
+			}catch(IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	},
+	ANGLETYPE {
+		@Override
+		public void read(String fileName) {
+
+			try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+				
+				String line;
+				
+				while((line = br.readLine())!= null) {
+					String[] split = line.split(" ");
+					List<String> asList = Arrays.asList(split);
+					asList = asList.stream().filter(s -> false == s.trim().isEmpty()).collect(Collectors.toList());
+					split =  asList.toArray(new String[asList.size()]);
+					
+					// why if reading an empty line?
+					if (split.length == 0) {
+						continue;
+					}
+
+					String idx = split[0];
+					Double r = Double.parseDouble(split[3]);
+					super.put(idx, r);
+				}
+				
+			}catch(IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	},
 	LJ {
@@ -109,7 +168,6 @@ enum Argument{
 
 				List<String> propertiesList = null;
 				
-				
 				while((line = br.readLine())!= null) {
 				
 					boolean isTitleLine = k++ == 0;
@@ -127,7 +185,7 @@ enum Argument{
 						continue;
 					}
 
-					List<Property> properties = this.extractProperties(split, propertiesList);
+					Set<Property> properties = this.extractProperties(split, propertiesList);
 					String name = split[0];
 					String anObject = split[1];
 					Boolean constant = "Y".equals(anObject);
@@ -135,18 +193,14 @@ enum Argument{
 					super.put(name, compound);
 				}
 				
-				
-				
-				
 			}catch(IOException e) {
 				throw new RuntimeException(e);
 			}
-			
 		}
 
-		private List<Property> extractProperties(String[] split, List<String> propertiesList) {
+		private Set<Property> extractProperties(String[] split, List<String> propertiesList) {
 
-			List<Property> properties = new ArrayList<>();
+			Set<Property> properties = new HashSet<>();
 
 			Double experimentalValue = 0d;
 			Double simulatedValue = 0d;
@@ -230,6 +284,202 @@ enum Argument{
 			return propertiesList;
 		}
 	},
+	ATOM {
+		@Override
+		public void read(String fileName) {
+			try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+				
+				Map<String, Object> data = Argument.DATA.getValuesFromFile();
+				// does not work with int
+				Map<Integer, Atom> atoms = new HashMap<Integer, Atom>();
+				// should it be null instead of ""?
+				String prevCod = "";
+				
+				String line = br.readLine();
+				while(line != null) {
+					String[] split = line.split(" ");
+					List<String> asList = Arrays.asList(split);
+					asList = asList.stream().filter(s -> false == s.trim().isEmpty()).collect(Collectors.toList());
+					split =  asList.toArray(new String[asList.size()]);
+					
+					String cod = split[0];
+					// error prone
+					int atmIdx = Integer.parseInt(split[1]);
+					String atmNam = split[2];
+					int atmTyp = Integer.parseInt(split[3]);
+					Double atmCHG = Double.parseDouble(split[4]);
+
+					if (!prevCod.isEmpty() && !prevCod.equals(cod)) {
+						super.put(prevCod, atoms);
+						Compound cmp = (Compound) data.get(prevCod);
+						cmp.setAtoms(atoms);
+						atoms = new HashMap<Integer, Atom>();
+					}
+
+					Atom atm = new Atom(cod, atmIdx, atmNam, atmTyp, atmCHG);
+					// check if atmIdx is already in atoms
+					atoms.put(atmIdx, atm);
+					prevCod = cod;
+					
+					line = br.readLine();
+					if (line  == null) {
+						super.put(cod, atoms);
+						Compound cmp = (Compound) data.get(prevCod);
+						cmp.setAtoms(atoms);
+					}
+				}
+			}catch(IOException e) {
+				throw new RuntimeException(e);
+			}
+			
+			// assign atoms to compounds
+			check();
+		}
+		
+		private void check() {
+			Map<String, Object> data = Argument.DATA.getValuesFromFile();
+			
+			// check if all compounds have a non empty map of atoms
+			for (Map.Entry<String, Object> d: data.entrySet()) {
+				Compound cmp = (Compound) d.getValue();
+				if (cmp.hasNoAtom()) {
+					throw new RuntimeException("No atoms");
+				}
+			}
+		}
+	},
+
+	BOND {
+		@Override
+		public void read(String fileName) {
+			System.out.println("reading a file called  " + fileName);
+			try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+				
+				Map<String, Object> data = Argument.DATA.getValuesFromFile();
+				List<Bond> bonds = new ArrayList<>();
+				String prevCod = "";
+				int k = 0;
+				
+				String line = br.readLine();
+				while(line != null) {
+
+					String[] split = super.splitThisLine(line);
+					
+					String cod = split[0];
+					int idx1 = Integer.parseInt(split[1]);
+					int idx2 = Integer.parseInt(split[2]);
+					int typ = Integer.parseInt(split[3]);
+					
+					if (!prevCod.isEmpty() && !prevCod.equals(cod)) {
+						super.put(prevCod, bonds);
+						// already add bonds to compounds
+						Compound cmp = (Compound) data.get(prevCod);
+						cmp.setBonds(bonds);
+						bonds = new ArrayList<>();
+						k = 0;
+					}
+					
+					Bond bnd = new Bond(cod, idx1, idx2, typ);
+					bonds.add(bnd);
+					prevCod = cod;
+					k = k + 1;
+					
+					line = br.readLine();
+					if (line  == null) {
+						super.put(cod, bonds);
+						Compound cmp = (Compound) data.get(prevCod);
+						cmp.setBonds(bonds);
+					}
+				}
+				
+				// here or outside of try/catch?
+				this.check();
+//				this.computeDist();
+				
+			}catch(IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		private void check() {
+			Map<String, Object> data = Argument.DATA.getValuesFromFile();
+			for (Map.Entry<String, Object> d: data.entrySet()) {
+				Compound cmp = (Compound) d.getValue();
+				if (cmp.hasNoBond()) {
+					if (!cmp.hasOnlyOneAtom()) {
+						throw new RuntimeException("No bonds");
+					}
+				}
+			}
+		}
+		
+		
+	},
+	
+	ANGLE {
+		@Override
+		public void read(String fileName) {
+
+			System.out.println("reading a file called  " + fileName);
+			
+			try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+				String line;
+
+				List<Angle> angles = new ArrayList<>();
+				
+				while((line = br.readLine()) != null) {
+					
+					String[] split = super.splitThisLine(line);
+						
+					String compoundName = split[0];
+					
+					String val1 = split[1];
+					String val2 = split[2];
+					String val3 = split[3];
+					String val4 = split[4];
+					
+					int index1 = new IntegerDecorator("split[1]", val1).value;
+					int index2 = new IntegerDecorator("split[2]", val2).value;
+					int index3 = new IntegerDecorator("split[3]", val3).value;
+					int index4 = new IntegerDecorator("split[4]", val4).value;
+					Angle angle = new Angle(compoundName, index1, index2, index3, index4);
+					angles.add(angle);
+					
+				}
+				
+				Map<String, Object> compounds = Argument.DATA.getValuesFromFile();
+				Set<String> allCompoundNames = angles.stream().map(angle -> angle.compoundName).collect(Collectors.toSet());
+				
+				for (String compoundName : allCompoundNames) {
+				
+					List<Angle> anglesWithThisCompoundName = angles.stream().filter(angle -> angle.compoundName.equals(compoundName)).collect(Collectors.toList());
+					super.put(compoundName, anglesWithThisCompoundName);
+					Object object = compounds.get(compoundName);
+					Compound compound = (Compound)object;
+					compound.setAngles(anglesWithThisCompoundName);
+				}
+				
+			}catch(IOException e) {
+				throw new RuntimeException(e);
+			}	
+		// do a check
+			this.computeDist();
+		}
+		// should this enum have this function?
+		private void computeDist() {
+			
+			Map<String, Object> angleTypes = Argument.ANGLETYPE.getValuesFromFile();
+			Map<String, Object> bondTypes = Argument.BONDTYPE.getValuesFromFile();
+			Map<String, Object> data = Argument.DATA.getValuesFromFile();
+
+			for (Map.Entry<String, Object> d: data.entrySet()) {
+				Compound compound = (Compound) d.getValue();
+				compound.setFirstNeighbour(bondTypes);
+				compound.setSecondNeighbour(angleTypes);
+			}
+		}
+	},
+	
 	PROP {
 		@Override
 		public void read(String fileName) {
@@ -262,7 +512,10 @@ enum Argument{
 			boolean isFolder = file.isDirectory();
 			
 			if(isFolder) {
-				String.format("Reading a folder called '%s' containing the files '%s'", fileName, Arrays.asList(file.list()));
+				
+				String msg = String.format("Reading a folder called '%s' containing the files '%s'", fileName, Arrays.asList(file.list()));
+			
+				System.out.println(msg);
 				
 				Map<String, Object> compounds = Argument.DATA.getValuesFromFile();
 				
@@ -278,15 +531,15 @@ enum Argument{
 					
 					Compound compound = (Compound)obj;
 					
-					List<Property> properties = compound.properties;
+					Set<Property> properties = compound.properties;
 
 					List<Deriv> derivateds = new ArrayList<>();
 					
 					for (Property property : properties) {
 						
-						StringBuilder derivName = new StringBuilder(compoundName).append("_").append(property.propertyName).append(".txt");
+						StringBuilder derivName = new StringBuilder(compoundName).append("_").append(property.propertyName).append(".dat");
 						
-						boolean derivNotFound = false == existingDerivs.contains(derivName.toString());	
+						boolean derivNotFound = false == existingDerivs.stream().map(x -> x.toUpperCase()).collect(Collectors.toList()).contains(derivName.toString().toUpperCase());	
 						
 						if(derivNotFound) {
 							String absolutePath = file.getAbsolutePath();
@@ -295,7 +548,16 @@ enum Argument{
 							continue;
 						}
 						
-						try(FileReader fr = new FileReader(new File(fileName)); BufferedReader br = new BufferedReader(fr)){
+						boolean hasErrors = false == errors.isEmpty();
+						
+						if(hasErrors) {
+							throw new RuntimeException("faltando os arquivos " + errors);
+						}
+						
+						String absolutePath = new File(fileName).getAbsolutePath();
+						String completePath = absolutePath + "/" + derivName;
+						
+						try(FileReader fr = new FileReader(completePath); BufferedReader br = new BufferedReader(fr)){
 							
 							String line;
 							
@@ -307,20 +569,23 @@ enum Argument{
 
 								String parameterValueAsString = split[split.length - 2];
 								String derivValueAsString = split[split.length - 1];
-								String atomTypeIndexAsString = split[1];
 								String name = split[0];
 								
 								Double derivValue = new Double(derivValueAsString);
 								Double parameterValue = new Double(parameterValueAsString);
+								// this function is called every time
 								Map<String, Object> valuesFromFile2 = Argument.LJ.getValuesFromFile();
-								AtomType at1 = (AtomType) valuesFromFile2.get(atomTypeIndexAsString);
 
 								if(parameterCharge) {
-									Deriv e = new Charge(parameterValue, derivValue, property, compound, name, at1);
+									String chargeIndex = split[2];
+									Long index = new Long(chargeIndex);
+									Deriv e = new Charge(parameterValue, derivValue, property, compound, name, index);
 									derivateds.add(e);
 									continue;
 								}
 
+								String atomTypeIndexAsString = split[1];
+								AtomType at1 = (AtomType) valuesFromFile2.get(atomTypeIndexAsString);
 								String atomType2IndexAsString = split[2];
 								AtomType at2 = (AtomType) valuesFromFile2.get(atomType2IndexAsString);
 								Deriv e = new opt.data.deriv.LJ(parameterValue, derivValue, property, compound, name, at1, at2);
@@ -332,13 +597,7 @@ enum Argument{
 						}
 						super.put(derivName.toString(), derivateds);
 					}
-					
-					
 				}
-				
-				
-				
-				
 				return;
 			}
 			
@@ -390,6 +649,8 @@ enum Argument{
 		this.valuesFromFile.clear();
 		this.valuesFromFile.putAll(valuesFromFile);
 	}
+	
+	
 	
 	public Map<String, Object> getValuesFromFile() {
 		Map<String, Object> unmodifiableMap = Collections.unmodifiableMap(valuesFromFile);
@@ -501,6 +762,14 @@ enum Argument{
 		
 	}
 
+	private static String[] splitThisLine(String line) {
+		String[] split = line.split(" ");
+		List<String> asList = Arrays.asList(split);
+		asList = asList.stream().filter(s -> false == s.trim().isEmpty()).collect(Collectors.toList());
+		split =  asList.toArray(new String[asList.size()]);
+		return split;
+	}
+
 	private void putAll(String fileName) {
 		
 		FileInputStream fis;
@@ -523,5 +792,6 @@ enum Argument{
 			this.put(key.toString(), value);
 		}
 	}
+	
 
 }
