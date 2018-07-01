@@ -12,6 +12,10 @@ public class matrix_jama {
 		Matrix b = new Matrix(new double[]{1., 1., 1.}, 1);     
 		Matrix c = b.times(a);  
 		System.out.println(Arrays.deepToString(c.getArray()));
-
+		
+		Matrix A = new Matrix(array);
+		Matrix b = Matrix.random(3,1);
+		Matrix x = A.solve(b);
+		System.out.println(Arrays.deepToString(c.getArray()));
 	}
 }
