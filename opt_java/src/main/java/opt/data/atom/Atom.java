@@ -42,12 +42,40 @@ public class Atom {
 
 	public double getDistance(int index2) {
 
-		Double double1 = this.firstNeighbour.get(index2);
-		return double1;
+		boolean isFirstNeighbour = this.firstNeighbour.containsKey(index2);
+
+		if(isFirstNeighbour) {
+			Double double1 = this.firstNeighbour.get(index2);
+			
+			
+			
+			return double1;
+			
+		}
+		boolean isSecondNeighbour = this.secondNeighbour.containsKey(index2);
+
+		if(isSecondNeighbour) {
+			Double double1 = this.secondNeighbour.get(index2);
+			
+			
+			return double1;
+			
+		}
+		throw new RuntimeException("Index out range " + index2);
+		
 	}
 
 	public void addSecondNeighbour(int index, double value) {
 		this.firstNeighbour.put(index, value);
 		
 	}
+	
+	public Atom changeCharge(double charge) {
+		
+		Atom atom = new Atom(this.code, this.index, this.name, this.type, charge);
+		return atom;
+		
+	} 
+	
+	
 }

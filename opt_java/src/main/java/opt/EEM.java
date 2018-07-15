@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import opt.data.Compound;
-import opt.data.atom.Atom;
-import opt.lj.AtomType;
 import opt.readers.Argument;
 
 public class EEM {
@@ -26,12 +24,16 @@ public class EEM {
 
 	public EEM computeCharge(){
 		Map<String, Compound> compounds = this.getMap(this.compounds, Compound.class);
-		Set<String> keySet = this.compounds.keySet();
+		Set<String> compoundNames = this.compounds.keySet();
 		
 		
-		keySet.stream().forEach(key -> {
-			Compound compound = compounds.get(key);
-			System.out.println(compound);
+		compoundNames.stream().forEach(compoundName -> {
+			System.out.println("********************************** " + compoundName);
+			Compound compound = compounds.get(compoundName);
+			Map<String, Object> valuesFromFile = Argument.LJ.getValuesFromFile();
+//			System.out.println(valuesFromFile.keySet());
+
+			compound.computeCharge(valuesFromFile);
 		});
 		
 		EEM eem = new EEM(this.compounds, this.atomsType);
@@ -56,11 +58,19 @@ public class EEM {
 	public static void main(String[] args) {
 		Argument.DATA.read("data.txt");
 		Map<String, Object> compounds = Argument.DATA.getValuesFromFile();
+		Argument.ATOM.read("listAtom.dat");
 		Argument.LJ.read("lj.txt");
 		Map<String, Object> atomsType = Argument.LJ.getValuesFromFile();
+		Argument.ANGLETYPE.read("angleType.dat");
+		Argument.BONDTYPE.read("bondType.dat");
+		Argument.BOND.read("listBond.dat");
+		Argument.ANGLE.read("listAng.dat");
 		
+	
+		Map<String, Object> valuesFromFile = Argument.LJ.getValuesFromFile();
+
 		EEM obj = new EEM(compounds, atomsType);
-		
+	
 		obj.computeCharge();
 	}
 	

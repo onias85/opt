@@ -27,6 +27,8 @@ public class AtomType {
 				,new ParameterDescription<Object, Object>("C12_3", Format.DOUBLE, properties)
 				,new ParameterDescription<Object, Object>("NAME", Format.STRING, properties)
 				,new ParameterDescription<Object, Object>("C06", Format.DOUBLE, properties)
+				,new ParameterDescription<Object, Object>("ELN", Format.DOUBLE, properties)
+				,new ParameterDescription<Object, Object>("HRD", Format.DOUBLE, properties)
 				);
 				
 	}
@@ -58,8 +60,28 @@ public class AtomType {
 		return list;
 	}
 	
+	
+	public String getName() {
+		
+		Object object = this.ps.properties.get("NAME");
+		
+		String name = (String)object;
+		
+		return name;
+	}
+	
 	public Long getIndex() {
 		Object object2 = this.ps.properties.get("INDEX");
 		return new Long(object2.toString());
+	}
+
+	public Double getHardness() {
+		Object object2 = this.ps.properties.get("HRD");
+		return new Double(object2.toString());
+	}
+
+	public Double getEletronegativity() {
+		Object object2 = this.ps.properties.get("ELN");
+		return new Double(object2.toString());
 	}
 }
